@@ -41,16 +41,17 @@ with tf.name_scope("Input") as scope:
 #mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
 #trX, trY, teX, teY = mnist.train.images, mnist.train.labels, mnist.test.images, mnist.test.labels
 # Here comes the input data
-    trX = trX.reshape(-1, 256, 256, 256, 1)  # 256x256x256x1 input img
-    teX = teX.reshape(-1, 256, 256, 256, 1)  # 256x256x256x1 input img
 
-    X = tf.placeholder("float", [None, 256, 256, 256, 100], name="X_input")
-    Y = tf.placeholder("float", [None, 256, 256, 256, 100], name="Y_input")
+    # trX = trX.reshape(-1, 256, 256, 256, 1)  # 256x256x256x1 input img
+    # teX = teX.reshape(-1, 256, 256, 256, 1)  # 256x256x256x1 input img
+
+    X = tf.placeholder("float", [None, 256, 256, 256, 1], name="X_input")
+    Y = tf.placeholder("float", [None, 256, 256, 256, 1], name="Y_input")
 
 with tf.name_scope("weight") as scope:
-    w = init_weights([3, 3, 1, 32])  # 3x3x1 conv, 32 outputs
-    w2 = init_weights([3, 3, 32, 64])  # 3x3x32 conv, 64 outputs
-    w3 = init_weights([3, 3, 64, 128])  # 3x3x32 conv, 128 outputs
+    w = init_weights([3, 3, 3, 1, 32])  # 3x3x1 conv, 32 outputs
+    w2 = init_weights([3, 3, 3, 32, 64])  # 3x3x32 conv, 64 outputs
+    w3 = init_weights([3, 3, 3, 64, 128])  # 3x3x32 conv, 128 outputs
     w4 = init_weights([128 * 4 * 4, 625])  # 128 filt 4 * 4 img
     w_o = init_weights([625, 256 * 256 * 256])  # FC 625 inputs, 256 * 256 * 256 outputs (labels)
 
@@ -64,7 +65,7 @@ with tf.name_scope("parameter") as scope:
     p_keep_hidden = tf.placeholder("float", name = "p_keep_hidden")
     py_x = model(X, w, w2, w3, w4, w_o, p_keep_conv, p_keep_hidden)
 
-with tf.name_scope("cost & train") as scope:
+with tf.name_scope("cost_and_train") as scope:
     cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(py_x, Y))
     cost_summ = tf.scalar_summary("cost & train", cost)
     train_op = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
@@ -90,8 +91,8 @@ with tf.Session() as sess:
             sess.run(train_op, feed_dict={X: trX[start:end], Y: trY[start:end],
                                           p_keep_conv: 0.8, p_keep_hidden: 0.5})
 
-            print sess.run(cost, feed_dict={X: trX[start:end], Y: trY[start:end],
-                                            p_keep_conv: 0.8, p_keep_hidden: 0.5})
+            print( sess.run(cost, feed_dict={X: trX[start:end], Y: trY[start:end],
+                                            p_keep_conv: 0.8, p_keep_hidden: 0.5}))
 
         #what the fuck?
         test_indices = np.arange(len(teX))  # Get A Test Batch
@@ -111,4 +112,4 @@ with tf.Session() as sess:
             writer.add_summary(summary, i)
 
     # I think this is wrong.
-    tensorboard --logidr=/tmp/mnist_logs
+    #tensorboard --logidr=/tmp/mnist_logs
