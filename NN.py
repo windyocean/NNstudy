@@ -166,7 +166,7 @@ def train_nn_for_organism_detection(list_of_file):
 
 def TensorboardSetting():
     ## Jaesung : TensorBoard Config
-    logs_path = "/tmp/mnist/2"  ###########
+
 
     # create a summary for our cost and accuracy
     tf.scalar_summary("cost", cost)
@@ -183,7 +183,7 @@ def LetTheGameBegin():
     init = tf.global_variables_initializer()
     sess.run(init)
 
-    writer = tf.train.SummaryWriter(logs_path, graph=tf.get_default_graph())
+    writer = tf.train.SummaryWriter("/tmp/mnist/2", graph=tf.get_default_graph())
 
     x_collect = np.asarray(x_collect) / 255
 
@@ -217,4 +217,8 @@ def LetTheGameBegin():
         for x in res[0]:
             f.write(str(x))
             f.write("\n")
+
+
+# Start !!
+LetTheGameBegin()
 
